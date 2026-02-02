@@ -1,0 +1,883 @@
+<!doctype html>
+<html lang="uz">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Turon Kafe - Buyurtma</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+        padding: 20px;
+      }
+
+      .container {
+        max-width: 600px;
+        margin: 0 auto;
+        background: white;
+        border-radius: 20px;
+        padding: 30px;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      }
+
+      .header {
+        text-align: center;
+        margin-bottom: 30px;
+        padding-bottom: 20px;
+        border-bottom: 3px solid #667eea;
+      }
+
+      .header h1 {
+        color: #667eea;
+        font-size: 2em;
+        margin-bottom: 10px;
+      }
+
+      .header p {
+        color: #666;
+        font-size: 1.1em;
+      }
+
+      .registration-form {
+        display: none;
+      }
+
+      .registration-form.active {
+        display: block;
+      }
+
+      .form-group {
+        margin-bottom: 20px;
+      }
+
+      .form-group label {
+        display: block;
+        margin-bottom: 8px;
+        color: #333;
+        font-weight: 600;
+        font-size: 1.1em;
+      }
+
+      .form-group input {
+        width: 100%;
+        padding: 15px;
+        border: 2px solid #e0e0e0;
+        border-radius: 10px;
+        font-size: 1em;
+        transition: all 0.3s;
+      }
+
+      .form-group input:focus {
+        outline: none;
+        border-color: #667eea;
+        box-shadow: 0 0 10px rgba(102, 126, 234, 0.2);
+      }
+
+      .btn {
+        width: 100%;
+        padding: 15px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border: none;
+        border-radius: 10px;
+        font-size: 1.1em;
+        font-weight: 600;
+        cursor: pointer;
+        transition: transform 0.2s;
+        margin-top: 10px;
+      }
+
+      .btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+      }
+
+      .btn:active {
+        transform: translateY(0);
+      }
+
+      .btn:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+      }
+
+      .menu-categories {
+        display: none;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 15px;
+        margin-top: 20px;
+      }
+
+      .menu-categories.active {
+        display: grid;
+      }
+
+      .category-card {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        padding: 30px 20px;
+        border-radius: 15px;
+        text-align: center;
+        cursor: pointer;
+        transition: all 0.3s;
+        color: white;
+        font-size: 1.2em;
+        font-weight: 600;
+      }
+
+      .category-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
+      }
+
+      .category-icon {
+        font-size: 3em;
+        margin-bottom: 10px;
+      }
+
+      .products-list {
+        display: none;
+      }
+
+      .products-list.active {
+        display: block;
+      }
+
+      .product-card {
+        background: #f8f9fa;
+        padding: 20px;
+        border-radius: 15px;
+        margin-bottom: 15px;
+        cursor: pointer;
+        transition: all 0.3s;
+        border: 2px solid transparent;
+      }
+
+      .product-card:hover {
+        border-color: #667eea;
+        transform: translateX(5px);
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+      }
+
+      .product-name {
+        font-size: 1.3em;
+        font-weight: 600;
+        color: #333;
+        margin-bottom: 5px;
+      }
+
+      .product-price {
+        font-size: 1.2em;
+        color: #667eea;
+        font-weight: 600;
+      }
+
+      .product-detail {
+        display: none;
+      }
+
+      .product-detail.active {
+        display: block;
+      }
+
+      .product-image {
+        width: 100%;
+        height: 250px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-radius: 15px;
+        margin-bottom: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 5em;
+      }
+
+      .product-info {
+        background: #f8f9fa;
+        padding: 20px;
+        border-radius: 15px;
+        margin-bottom: 20px;
+      }
+
+      .product-info h2 {
+        color: #333;
+        margin-bottom: 10px;
+      }
+
+      .product-info p {
+        color: #666;
+        line-height: 1.6;
+        margin-bottom: 15px;
+      }
+
+      .product-info .price {
+        font-size: 1.5em;
+        color: #667eea;
+        font-weight: 700;
+      }
+
+      .back-btn {
+        background: #6c757d;
+        margin-bottom: 10px;
+      }
+
+      .confirm-modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.7);
+        align-items: center;
+        justify-content: center;
+        z-index: 1000;
+      }
+
+      .confirm-modal.active {
+        display: flex;
+      }
+
+      .confirm-content {
+        background: white;
+        padding: 30px;
+        border-radius: 20px;
+        max-width: 400px;
+        width: 90%;
+        text-align: center;
+      }
+
+      .confirm-content h3 {
+        color: #333;
+        margin-bottom: 20px;
+        font-size: 1.5em;
+      }
+
+      .confirm-buttons {
+        display: flex;
+        gap: 10px;
+        margin-top: 20px;
+      }
+
+      .confirm-buttons button {
+        flex: 1;
+        padding: 15px;
+        border: none;
+        border-radius: 10px;
+        font-size: 1em;
+        font-weight: 600;
+        cursor: pointer;
+      }
+
+      .btn-yes {
+        background: #28a745;
+        color: white;
+      }
+
+      .btn-no {
+        background: #dc3545;
+        color: white;
+      }
+
+      .success-message {
+        display: none;
+        text-align: center;
+        padding: 30px;
+      }
+
+      .success-message.active {
+        display: block;
+      }
+
+      .success-icon {
+        font-size: 5em;
+        color: #28a745;
+        margin-bottom: 20px;
+      }
+
+      .success-message h2 {
+        color: #28a745;
+        margin-bottom: 15px;
+      }
+
+      .success-message p {
+        color: #666;
+        line-height: 1.6;
+      }
+
+      .loading {
+        display: none;
+        text-align: center;
+        padding: 20px;
+      }
+
+      .loading.active {
+        display: block;
+      }
+
+      .spinner {
+        border: 4px solid #f3f3f3;
+        border-top: 4px solid #667eea;
+        border-radius: 50%;
+        width: 50px;
+        height: 50px;
+        animation: spin 1s linear infinite;
+        margin: 20px auto;
+      }
+
+      @keyframes spin {
+        0% {
+          transform: rotate(0deg);
+        }
+        100% {
+          transform: rotate(360deg);
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="header">
+        <h1>🍽️ Turon Kafe</h1>
+        <p>Buyurtma bering, uyingizga yetkazamiz!</p>
+      </div>
+
+      <!-- Loading -->
+      <div id="loading" class="loading">
+        <div class="spinner"></div>
+        <p>Yuklanmoqda...</p>
+      </div>
+
+      <!-- Registration Form -->
+      <div id="registrationForm" class="registration-form active">
+        <div class="form-group">
+          <label>👤 Ismingiz:</label>
+          <input type="text" id="firstName" placeholder="Ismingizni kiriting" />
+        </div>
+        <div class="form-group">
+          <label>👤 Familiyangiz:</label>
+          <input
+            type="text"
+            id="lastName"
+            placeholder="Familiyangizni kiriting"
+          />
+        </div>
+        <div class="form-group">
+          <label>📱 Telefon raqamingiz:</label>
+          <input type="tel" id="phone" placeholder="+998 90 123 45 67" />
+        </div>
+        <div class="form-group">
+          <label>📍 Manzilingiz:</label>
+          <input
+            type="text"
+            id="address"
+            placeholder="To'liq manzilingizni kiriting"
+          />
+        </div>
+        <button class="btn" id="registerBtn" onclick="completeRegistration()">
+          ✅ Ro'yxatdan o'tish
+        </button>
+      </div>
+
+      <!-- Menu Categories -->
+      <div id="menuCategories" class="menu-categories">
+        <div class="category-card" onclick="showCategory('fastfood')">
+          <div class="category-icon">🍔</div>
+          <div>Fast-Food</div>
+        </div>
+        <div class="category-card" onclick="showCategory('pizza')">
+          <div class="category-icon">🍕</div>
+          <div>Pitsalar</div>
+        </div>
+        <div class="category-card" onclick="showCategory('national')">
+          <div class="category-icon">🍲</div>
+          <div>Milliy taomlar</div>
+        </div>
+        <div class="category-card" onclick="showCategory('sweets')">
+          <div class="category-icon">🍰</div>
+          <div>Shirinliklar</div>
+        </div>
+        <div class="category-card" onclick="showCategory('drinks')">
+          <div class="category-icon">🥤</div>
+          <div>Ichimliklar</div>
+        </div>
+        <div class="category-card" onclick="showCategory('bread')">
+          <div class="category-icon">🍞</div>
+          <div>Non mahsulotlari</div>
+        </div>
+      </div>
+
+      <!-- Products List -->
+      <div id="productsList" class="products-list"></div>
+
+      <!-- Product Detail -->
+      <div id="productDetail" class="product-detail"></div>
+
+      <!-- Success Message -->
+      <div id="successMessage" class="success-message">
+        <div class="success-icon">✅</div>
+        <h2>Buyurtma qabul qilindi!</h2>
+        <p id="orderNumber"></p>
+        <p>Tez orada operatorlarimiz siz bilan bog'lanadi.</p>
+        <button class="btn" onclick="backToMenu()">
+          🏠 Asosiy menyuga qaytish
+        </button>
+      </div>
+    </div>
+
+    <!-- Confirm Modal -->
+    <div id="confirmModal" class="confirm-modal">
+      <div class="confirm-content">
+        <h3>❓ Buyurtma bermoqchimisiz?</h3>
+        <p id="confirmProductName"></p>
+        <p id="confirmProductPrice"></p>
+        <div class="confirm-buttons">
+          <button class="btn-yes" id="confirmBtn" onclick="confirmOrder()">
+            ✅ Ha
+          </button>
+          <button class="btn-no" onclick="closeConfirmModal()">❌ Yo'q</button>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // Backend API URL (o'zingizni server URL ni kiriting)
+      const API_URL = "http://localhost:5000/api";
+      
+
+      // Production uchun: const API_URL = 'https://yourserver.com/api';
+
+      // Telegram Web App init
+      let tg = window.Telegram.WebApp;
+      tg.expand();
+
+      // User data
+      let userData = {
+        telegram_id: tg.initDataUnsafe?.user?.id || "test_user_" + Date.now(),
+        username: tg.initDataUnsafe?.user?.username || "test",
+      };
+
+      // Products database
+      const products = {
+        fastfood: [
+          {
+            id: 1,
+            name: "KFC 250gr",
+            price: 22000,
+            desc: "Mazali tovuq go'shti, kartoshka fri, sous",
+            icon: "🍗",
+          },
+          {
+            id: 2,
+            name: "Lavash 25",
+            price: 25000,
+            desc: "Mol go'shti, sabzavotlar, sous, lavash",
+            icon: "🌯",
+          },
+          {
+            id: 3,
+            name: "Tandir Lavash",
+            price: 28000,
+            desc: "Tandirda pishirilgan lavash, go'sht, sabzavot",
+            icon: "🌮",
+          },
+          {
+            id: 4,
+            name: "Big Lavash",
+            price: 32000,
+            desc: "Katta o'lchamli lavash, ko'p go'sht",
+            icon: "🌯",
+          },
+          {
+            id: 5,
+            name: "Xotdog 10",
+            price: 10000,
+            desc: "Klassik xotdog, sous",
+            icon: "🌭",
+          },
+          {
+            id: 6,
+            name: "Xotdog 12",
+            price: 12000,
+            desc: "Katta xotdog, qo'shimcha sous",
+            icon: "🌭",
+          },
+          {
+            id: 7,
+            name: "Go'shtli Xotdog",
+            price: 15000,
+            desc: "Premium go'sht, maxsus sous",
+            icon: "🌭",
+          },
+          {
+            id: 8,
+            name: "Gamburger 20",
+            price: 20000,
+            desc: "Klassik gamburger, kotlet, sabzavot",
+            icon: "🍔",
+          },
+          {
+            id: 9,
+            name: "Chizburger 23",
+            price: 23000,
+            desc: "Gamburger + pishloq",
+            icon: "🍔",
+          },
+        ],
+        pizza: [
+          {
+            id: 10,
+            name: "Peperoni Pitsa",
+            price: 45000,
+            desc: "Peperoni kolbasa, mozzarella, pomidor sousi",
+            icon: "🍕",
+          },
+          {
+            id: 11,
+            name: "Big Peperoni",
+            price: 65000,
+            desc: "Katta o'lcham peperoni pitsa",
+            icon: "🍕",
+          },
+          {
+            id: 12,
+            name: "Go'shtli Pitsa",
+            price: 50000,
+            desc: "Turli xil go'shtlar, mozzarella",
+            icon: "🍕",
+          },
+          {
+            id: 13,
+            name: "Assarti 70",
+            price: 70000,
+            desc: "Aralash pitsa, turli ingredientlar",
+            icon: "🍕",
+          },
+          {
+            id: 14,
+            name: "Big Assarti",
+            price: 85000,
+            desc: "Katta aralash pitsa",
+            icon: "🍕",
+          },
+        ],
+        national: [
+          {
+            id: 15,
+            name: "Osh",
+            price: 25000,
+            desc: "O'zbek milliy taomi - palov",
+            icon: "🍚",
+          },
+          {
+            id: 16,
+            name: "Manti",
+            price: 20000,
+            desc: "Bug'da pishirilgan manti",
+            icon: "🥟",
+          },
+          {
+            id: 17,
+            name: "Shurva",
+            price: 18000,
+            desc: "Milliy sho'rva",
+            icon: "🍲",
+          },
+          {
+            id: 18,
+            name: "Lag'mon",
+            price: 22000,
+            desc: "O'zbekcha lag'mon",
+            icon: "🍜",
+          },
+        ],
+        sweets: [
+          {
+            id: 19,
+            name: "Tort (kichik)",
+            price: 35000,
+            desc: "Shokoladli tort",
+            icon: "🎂",
+          },
+          {
+            id: 20,
+            name: "Napoleon",
+            price: 15000,
+            desc: "Klassik napoleon tort",
+            icon: "🍰",
+          },
+          {
+            id: 21,
+            name: "Tiramisu",
+            price: 25000,
+            desc: "Italyan shirinligi",
+            icon: "🍰",
+          },
+        ],
+        drinks: [
+          {
+            id: 22,
+            name: "Coca-Cola 1L",
+            price: 8000,
+            desc: "Sovuq ichimlik",
+            icon: "🥤",
+          },
+          {
+            id: 23,
+            name: "Fanta 1L",
+            price: 8000,
+            desc: "Apelsinli ichimlik",
+            icon: "🥤",
+          },
+          {
+            id: 24,
+            name: "Choy",
+            price: 3000,
+            desc: "Qora/ko'k choy",
+            icon: "☕",
+          },
+          {
+            id: 25,
+            name: "Kofe",
+            price: 5000,
+            desc: "Amerikano/Cappuccino",
+            icon: "☕",
+          },
+        ],
+        bread: [
+          {
+            id: 26,
+            name: "Oq Non",
+            price: 2000,
+            desc: "Tandirda pishirilgan non",
+            icon: "🍞",
+          },
+          {
+            id: 27,
+            name: "Patir",
+            price: 3000,
+            desc: "Yog'li patir non",
+            icon: "🥖",
+          },
+          {
+            id: 28,
+            name: "Kulcha",
+            price: 2500,
+            desc: "Kichik kulcha non",
+            icon: "🥯",
+          },
+        ],
+      };
+
+      let currentCategory = "";
+      let currentProduct = null;
+
+      async function completeRegistration() {
+        const firstName = document.getElementById("firstName").value.trim();
+        const lastName = document.getElementById("lastName").value.trim();
+        const phone = document.getElementById("phone").value.trim();
+        const address = document.getElementById("address").value.trim();
+
+        if (!firstName || !lastName || !phone || !address) {
+          tg.showAlert("⚠️ Iltimos, barcha maydonlarni to'ldiring!");
+          return;
+        }
+
+        // Disable button
+        const btn = document.getElementById("registerBtn");
+        btn.disabled = true;
+        btn.textContent = "Yuklanmoqda...";
+
+        try {
+          const response = await fetch(`${API_URL}/register`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              telegram_id: userData.telegram_id,
+              firstName,
+              lastName,
+              phone,
+              address,
+            }),
+          });
+
+          const result = await response.json();
+
+          if (result.status === "success") {
+            userData.firstName = firstName;
+            userData.lastName = lastName;
+            userData.phone = phone;
+            userData.address = address;
+
+            document
+              .getElementById("registrationForm")
+              .classList.remove("active");
+            document.getElementById("menuCategories").classList.add("active");
+
+            tg.showAlert("✅ Ro'yxatdan muvaffaqiyatli o'tdingiz!");
+          } else {
+            throw new Error(result.message);
+          }
+        } catch (error) {
+          console.error("Registration error:", error);
+          tg.showAlert("❌ Xatolik yuz berdi. Qaytadan urinib ko'ring.");
+        } finally {
+          btn.disabled = false;
+          btn.textContent = "✅ Ro'yxatdan o'tish";
+        }
+      }
+
+      function showCategory(category) {
+        currentCategory = category;
+        const productsList = document.getElementById("productsList");
+
+        let html =
+          '<button class="btn back-btn" onclick="backToCategories()">⬅️ Orqaga</button>';
+
+        products[category].forEach((product) => {
+          html += `
+                    <div class="product-card" onclick="showProductDetail(${product.id})">
+                        <div class="product-name">${product.icon} ${product.name}</div>
+                        <div class="product-price">${formatPrice(product.price)} so'm</div>
+                    </div>
+                `;
+        });
+
+        productsList.innerHTML = html;
+        document.getElementById("menuCategories").classList.remove("active");
+        productsList.classList.add("active");
+      }
+
+      function showProductDetail(productId) {
+        const product = Object.values(products)
+          .flat()
+          .find((p) => p.id === productId);
+        currentProduct = product;
+
+        const html = `
+                <button class="btn back-btn" onclick="backToProducts()">⬅️ Orqaga</button>
+                <div class="product-image">${product.icon}</div>
+                <div class="product-info">
+                    <h2>${product.name}</h2>
+                    <p>${product.desc}</p>
+                    <div class="price">${formatPrice(product.price)} so'm</div>
+                </div>
+                <button class="btn" onclick="openConfirmModal()">✅ Buyurtma berish</button>
+            `;
+
+        document.getElementById("productDetail").innerHTML = html;
+        document.getElementById("productsList").classList.remove("active");
+        document.getElementById("productDetail").classList.add("active");
+      }
+
+      function openConfirmModal() {
+        document.getElementById("confirmProductName").textContent =
+          currentProduct.name;
+        document.getElementById("confirmProductPrice").textContent =
+          formatPrice(currentProduct.price) + " so'm";
+        document.getElementById("confirmModal").classList.add("active");
+      }
+
+      function closeConfirmModal() {
+        document.getElementById("confirmModal").classList.remove("active");
+      }
+
+      async function confirmOrder() {
+        const btn = document.getElementById("confirmBtn");
+        btn.disabled = true;
+        btn.textContent = "Yuborilmoqda...";
+
+        try {
+          const response = await fetch(`${API_URL}/order`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              telegram_id: userData.telegram_id,
+              product: currentProduct,
+            }),
+          });
+
+          const result = await response.json();
+
+          if (result.status === "success") {
+            closeConfirmModal();
+            document.getElementById("productDetail").classList.remove("active");
+            document.getElementById("orderNumber").textContent =
+              `Buyurtma raqami: #${result.order_id}`;
+            document.getElementById("successMessage").classList.add("active");
+
+            // Telegram haptic feedback
+            if (tg.HapticFeedback) {
+              tg.HapticFeedback.notificationOccurred("success");
+            }
+          } else {
+            throw new Error(result.message);
+          }
+        } catch (error) {
+          console.error("Order error:", error);
+          tg.showAlert(
+            "❌ Buyurtma yuborishda xatolik. Qaytadan urinib ko'ring.",
+          );
+        } finally {
+          btn.disabled = false;
+          btn.textContent = "✅ Ha";
+        }
+      }
+
+      function backToCategories() {
+        document.getElementById("productsList").classList.remove("active");
+        document.getElementById("menuCategories").classList.add("active");
+      }
+
+      function backToProducts() {
+        document.getElementById("productDetail").classList.remove("active");
+        document.getElementById("productsList").classList.add("active");
+      }
+
+      function backToMenu() {
+        document.getElementById("successMessage").classList.remove("active");
+        document.getElementById("menuCategories").classList.add("active");
+      }
+
+      function formatPrice(price) {
+        return price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ");
+      }
+
+      // Check if user already registered
+      async function checkUserRegistration() {
+        try {
+          const response = await fetch(
+            `${API_URL}/user/${userData.telegram_id}`,
+          );
+          const result = await response.json();
+
+          if (result.status === "success" && result.user) {
+            userData = { ...userData, ...result.user };
+            document
+              .getElementById("registrationForm")
+              .classList.remove("active");
+            document.getElementById("menuCategories").classList.add("active");
+          }
+        } catch (error) {
+          console.log("User not registered yet");
+        }
+      }
+
+      // Initialize
+      window.addEventListener("load", () => {
+        checkUserRegistration();
+      });
+    </script>
+  </body>
+</html>
